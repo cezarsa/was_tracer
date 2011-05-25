@@ -120,7 +120,7 @@ module WasTracer
   
     def render_html_frames(output_name)
       $stderr.puts "Rendering frames..."
-      Dir.mkdir(output_name)
+      Dir.mkdir(output_name) unless File.directory?(output_name)
       write_template('frameset.html.erb', output_name, 'main')
       write_template('threads.html.erb', output_name, 'threads')
       @threads.each do |thread, root_node|
