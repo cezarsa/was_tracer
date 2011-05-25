@@ -6,12 +6,17 @@ require 'erb'
 
 module WasTracer
   class Trace
-    def initialize(file_name, parse_percent)
+    def initialize(file_name, options = {})
       @file_name = file_name
-      @parse_percent = parse_percent
+      @parse_percent = options[:partial_parse] || 100
+      @verbose = options[:verbose] || false
       File.open file_name, 'rb' do |f|
         @threads = parse f
       end
+    end
+
+    def verbose_log(msg)
+      puts msg if @verbose
     end
   
     def parse(f)
@@ -22,7 +27,7 @@ module WasTracer
 
       progress = 0
       total_sz = f.stat.size
-      $stderr.puts "Parsing..."
+      verbose_log "Parsing..."
       f.each_line do |line_data|
         current_line += 1
         trace_line = TraceLine.from_line(line_data, current_line)
@@ -31,16 +36,12 @@ module WasTracer
           next
         end
 
-
         threadid = trace_line.thread_id
-
 
         methods_map = methods_thread_map[threadid] ||= {}
         node_stack = threads[threadid] ||= [Node.new(0)]
 
-
         current_parent = node_stack.last
-
 
         if trace_line.entering?
           node = Node.new(node_stack.size)
@@ -69,10 +70,7 @@ module WasTracer
           end
           node = node_stack.pop
           if node.entry_line.method_name != trace_line.method_name
-            puts "\n\n\nStack Depth: #{node_stack.size}"
-            puts "Method: #{node.entry_line.method_name} - Line: #{node.entry_line.line_number}"
-            puts "Method: #{trace_line.method_name} - Line: #{trace_line.line_number}"
-            raise "Invalid stack!\nEntry Line: #{node.entry_line.line}Exit Line : #{trace_line.line}"
+            raise "Invalid stack!\nEntry Line: #{node.entry_line.line} Exit Line : #{trace_line.line}"
           end
           node.exit_line = trace_line
         else
@@ -85,14 +83,14 @@ module WasTracer
         new_progress = ((cur_bytes * 100) / total_sz)
         break if @parse_percent < 100 and new_progress >= @parse_percent
         if new_progress - progress >= 5
-          $stderr.puts "%02d%%" % (progress = new_progress)
+          verbose_log "%02d%%" % (progress = new_progress)
         end
       end
-      $stderr.puts "Consolidating threads..."
+      verbose_log "Consolidating threads..."
       threads.merge!(threads) { |k, v| v.first }
 
       # removing incomplete nodes
-      $stderr.puts "Removing incomplete nodes..."
+      verbose_log "Removing incomplete nodes..."
       threads.each do |thread, root_node|
         root_node.children.delete_if do |node|
           node.exit_line.nil?
@@ -119,18 +117,18 @@ module WasTracer
     end
   
     def render_html_frames(output_name)
-      $stderr.puts "Rendering frames..."
+      verbose_log "Rendering frames..."
       Dir.mkdir(output_name) unless File.directory?(output_name)
       write_template('frameset.html.erb', output_name, 'main')
       write_template('threads.html.erb', output_name, 'threads')
       @threads.each do |thread, root_node|
         next unless root_node.has_long_children?
-        $stderr.puts "Rendering thread #{thread}..."
+        verbose_log "Rendering thread #{thread}..."
         @thread = thread
         @current_node = root_node
         write_template('one_thread.html.erb', output_name, "thread_#{thread}")
       end
-      $stderr.puts "Done."
+      verbose_log "Done."
     end
 
     def render_template(template, cur_binding = binding)

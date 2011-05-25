@@ -4,7 +4,6 @@ require "was_tracer"
 
 output_file = ARGV[0]
 trace_file = ARGV[1] || 'trace.log'
-parse_percent = (ARGV[2] || 100).to_i
 
-t = WasTracer::Trace.new(trace_file, parse_percent)
+t = WasTracer::Trace.new(trace_file, :verbose => true)
 t.render_html_frames(output_file)
