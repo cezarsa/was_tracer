@@ -1,0 +1,14 @@
+<% @current_node.children.each do |node| %>
+  <% next if node.level == 1 and node.duration == 0 %>
+  <div class="node">
+    <span class="duration" style="background-color: rgb(255, 255, <%= [0, 255 - (9 * node.duration)].max.to_i %>)"><%= node.duration_str %></span> 
+    <span class="duration" style="background-color: rgb(255, 255, <%= [0, 255 - (9 * node.self_duration)].max.to_i %>)"><%= node.self_duration_str %></span> 
+    <span class="desc <%= 'has_children' if node.has_children? %>"><%= node %></span> 
+    <span class="details_trigger"><%= node.time %> &gt;&gt;</span> 
+    <span class="details"><%= node.details %></span> 
+    <div class="details"><%= node.more_details %></div> 
+    <div class="children">
+      <%= render_children node, 'node.html.erb' %>
+    </div>
+  </div>
+<% end %>

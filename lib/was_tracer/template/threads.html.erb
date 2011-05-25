@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html {
+        font-family: monospace;
+        font-size: 9pt;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+
+  <body>
+    <% @threads.sort {|t1, t2| t2[1].longer_child_duration <=> t1[1].longer_child_duration }.each do |thread, node| %>
+      <% next unless node.has_long_children? %>
+      <a href="<%= output_name %>_thread_<%= thread %>.html" target="thread_frame"><%= thread %> (<%= node.longer_child_duration %>)</a><br/>
+    <% end %>
+  </body>
+</html>

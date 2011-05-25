@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html {
+        font-family: monospace;
+        font-size: 9pt;
+        white-space: nowrap;
+      }
+      pre {
+        margin: 0;
+      }
+      .children {
+        display: none;
+        padding-left: 20px;
+        border-left: 1px solid #aaa;
+      }
+      .node .desc.has_children {
+        color: red;
+        cursor: pointer;
+      }
+      .node .details_trigger {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+      .node .duration.long {
+        color: blue;
+      }
+      .node .details {
+        display: none;
+      }
+    </style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script>
+      $(function() {
+        $("div.node .desc").live('click', function() {
+          $(this).nextAll(".children").toggle();
+        });
+        $("div.node .details_trigger").live('click', function() {
+          $(this).nextAll(".details").toggle();
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <h3>Thread <%= @thread %></h3>
+    <%= render_children @current_node, 'node.html.erb' %>
+  </body>
+</html>

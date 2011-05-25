@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <script>
+    function blankFrame() {
+      return "<html><body></body></html>";
+    }
+  </script>
+  <frameset cols="20%,*">
+    <frame src="<%= output_name %>_threads.html" />
+    <frame src="javascript:parent.blankFrame();" name="thread_frame" />
+  </frameset>
+</html>
