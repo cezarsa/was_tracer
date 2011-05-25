@@ -1,0 +1,22 @@
+** was_tracer
+
+This gem allows you to parse IBM's Websphere Application Server trace files
+containing methods entries and exits and outputs a set of HTML files that allows
+you to navigate through a recreated call stack highlighting possible
+bottlenecks.
+
+** Usage
+
+* Gem:
+
+$ gem install was_tracer
+$ was_tracer <output name> <trace file>
+
+* From source:
+
+$ git clone git://github.com/cezarsa/was_tracer.git
+$ cd was_tracer
+$ bin/was_tracer <output name> <trace file>
+
+A directory named <output name> will be created, just open the file named
+<output name>_main.html in your browser and rejoice!
