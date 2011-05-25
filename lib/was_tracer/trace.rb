@@ -1,4 +1,5 @@
 require 'erb'
+require 'fileutils'
 [
   'node.rb',
   'trace_line.rb'
@@ -128,6 +129,7 @@ module WasTracer
         @current_node = root_node
         write_template('one_thread.html.erb', output_name, "thread_#{thread}")
       end
+      FileUtils.cp(File.expand_path("../template/jquery.js", __FILE__), "#{output_name}/jquery.js")
       verbose_log "Done."
     end
 
