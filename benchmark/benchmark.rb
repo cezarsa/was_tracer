@@ -6,9 +6,12 @@ require "benchmark"
 
 tmp_name = 'tmp_dkjsady83hai'
 
+t = nil
 Benchmark.bmbm do |x|
-  x.report {
+  x.report("Parsing") {
     t = WasTracer::Trace.new(File.expand_path('../trace.log', __FILE__))
+  }
+  x.report("Rendering") {
     t.render_html_frames(tmp_name)
   }
 end
